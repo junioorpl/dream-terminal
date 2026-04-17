@@ -7,13 +7,13 @@ font-feature = +calt
 font-feature = +liga
 
 # Theme — Tokyo Night Storm (built-in)
-theme = tokyonight_storm
+theme = TokyoNight Storm
 background-opacity = 0.78
 background-blur-radius = 40
 unfocused-split-opacity = 0.88
 cursor-style = block
 cursor-color = #ff4fcf
-selection-background = #ff4fcf33
+selection-background = #ff4fcf
 
 # Window / tabs
 window-decoration = true
