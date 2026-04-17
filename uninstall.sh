@@ -2,7 +2,7 @@
 # uninstall.sh — restores files from the most recent dream-terminal backup
 set -euo pipefail
 
-REPO="$HOME/cabral-dev/dream-terminal"
+REPO="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BACKUP_ROOT="$HOME"
 
 log()  { printf '\033[0;36m[dream]\033[0m %s\n' "$*"; }

@@ -1,6 +1,6 @@
 # AI Workflow — Claude Code CLI + brain/prompts
 
-Claude Code CLI is the AI layer. The terminal is speed + keyboard + a thin launcher layer on top of the brain vault at `~/cabral-dev/brain/`.
+Claude Code CLI is the AI layer. The terminal is speed + keyboard + a thin launcher layer on top of an Obsidian-style brain vault. Point `BRAIN_DIR` at yours (defaults to `$HOME/cabral-dev/brain`).
 
 ## Daily launch pattern
 

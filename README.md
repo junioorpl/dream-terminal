@@ -13,13 +13,27 @@ Reproducible macOS terminal + shell + IDE-integrated-terminal stack with Claude 
 ## Install
 
 ```bash
-git clone <repo-url> ~/cabral-dev/dream-terminal
-cd ~/cabral-dev/dream-terminal
-bash install.sh
+git clone https://github.com/junioorpl/dream-terminal.git
+cd dream-terminal
+bash install.sh              # --dry-run to preview
 ```
+
+`install.sh` auto-detects its own location, so the repo can live anywhere.
 
 Backups of replaced files land in `~/.dream-terminal-backup-<timestamp>/`.
 Undo with `bash uninstall.sh`.
+
+### Optional — point at your own brain vault
+
+Shell helpers (`bn`, `aip`, `brain`, `bnl`, …) assume a Markdown notes directory.
+Default: `$HOME/cabral-dev/brain`. Override before `install.sh` runs, or export in
+`~/.zshrc` after installation:
+
+```zsh
+export BRAIN_DIR="$HOME/path/to/your/obsidian-vault"
+```
+
+If the directory doesn't exist, the helpers become no-ops — nothing breaks.
 
 ## Docs
 

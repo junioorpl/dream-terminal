@@ -2,7 +2,7 @@
 # install.sh — dream-terminal installer (idempotent, reversible)
 set -euo pipefail
 
-REPO="$HOME/cabral-dev/dream-terminal"
+REPO="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BACKUP_ROOT="$HOME"
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 BACKUP="${BACKUP_ROOT}/.dream-terminal-backup-${TIMESTAMP}"
@@ -115,15 +115,18 @@ ensure_zshrc_block() {
   fi
   mkdir -p "$BACKUP"
   cp -a "$rc" "$BACKUP/.zshrc"
-  cat >> "$rc" <<'EOF'
+  cat >> "$rc" <<EOF
 
 # >>> dream-terminal >>>
-source "$HOME/cabral-dev/dream-terminal/zsh/aliases.zsh"
-source "$HOME/cabral-dev/dream-terminal/zsh/functions.zsh"
-source "$HOME/cabral-dev/dream-terminal/zsh/completions.zsh"
-eval "$(starship init zsh)"
-eval "$(zoxide init zsh)"
-eval "$(atuin init zsh)"
+export DREAM_TERMINAL_REPO="$REPO"
+# Optional: override where the brain vault lives (default: \$HOME/cabral-dev/brain)
+# export BRAIN_DIR="\$HOME/path/to/your/obsidian-vault"
+source "\$DREAM_TERMINAL_REPO/zsh/aliases.zsh"
+source "\$DREAM_TERMINAL_REPO/zsh/functions.zsh"
+source "\$DREAM_TERMINAL_REPO/zsh/completions.zsh"
+eval "\$(starship init zsh)"
+eval "\$(zoxide init zsh)"
+eval "\$(atuin init zsh)"
 # <<< dream-terminal <<<
 EOF
   log "appended dream-terminal block to ~/.zshrc"
