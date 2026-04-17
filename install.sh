@@ -145,15 +145,21 @@ remove_zinit_block() {
 remove_spaceship_theme() {
   local rc="$HOME/.zshrc"
   [[ -f "$rc" ]] || return 0
-  grep -q '^ZSH_THEME="spaceship"' "$rc" || { log "✓ no active spaceship theme"; return; }
+  # Detect either the theme line OR leftover SPACESHIP_* identifiers
+  if ! grep -qE '^(ZSH_THEME="spaceship"|SPACESHIP_)' "$rc"; then
+    log "✓ no spaceship config"
+    return
+  fi
   if [[ "$DRY_RUN" == "--dry-run" ]]; then
-    log "would comment out ZSH_THEME=spaceship"
+    log "would delete spaceship config block(s)"
     return
   fi
   cp -a "$rc" "$BACKUP/.zshrc.pre-theme-removal"
-  sed -i '' 's/^ZSH_THEME="spaceship"/# ZSH_THEME="spaceship"  # superseded by starship/' "$rc"
-  sed -i '' '/^SPACESHIP_/s/^/# /' "$rc"
-  log "commented out spaceship config; starship takes over"
+  # Delete full spaceship stanza: theme line, multi-line PROMPT_ORDER array, and any SPACESHIP_* scalars
+  sed -i '' '/^ZSH_THEME="spaceship"/d' "$rc"
+  sed -i '' '/^SPACESHIP_[A-Z_]*=(/,/^)/d' "$rc"
+  sed -i '' '/^SPACESHIP_/d' "$rc"
+  log "removed spaceship config; starship takes over"
 }
 
 install_omz_custom_plugin() {

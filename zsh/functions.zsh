@@ -1,6 +1,12 @@
 # dream-terminal — functions
 # Sourced from ~/.zshrc. Requires: fd, fzf, bat, jq.
 
+# User's legacy ~/.zshrc defines some of the names below as aliases
+# (sp, m4, fc, creatr, pull, commit, merge-*). zsh expands aliases when
+# *defining* a function of the same name, causing "parse error near '()'".
+# Drop any pre-existing aliases before redefining as functions.
+unalias sp m4 fc creatr pull commit merge-master merge-main merge-develop 2>/dev/null
+
 # Obsidian launcher — mirrors `cursor <path>` pattern
 obsidian() {
   local target="${1:-$HOME/cabral-dev/brain}"
