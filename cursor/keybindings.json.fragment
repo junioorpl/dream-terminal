@@ -1,0 +1,7 @@
+[
+  { "key": "cmd+d",       "command": "workbench.action.terminal.split",        "when": "terminalFocus" },
+  { "key": "cmd+shift+d", "command": "workbench.action.terminal.split",        "when": "terminalFocus" },
+  { "key": "cmd+]",       "command": "workbench.action.terminal.focusNext",    "when": "terminalFocus" },
+  { "key": "cmd+[",       "command": "workbench.action.terminal.focusPrevious","when": "terminalFocus" },
+  { "key": "cmd+k",       "command": "workbench.action.terminal.clear",        "when": "terminalFocus" }
+]
