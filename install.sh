@@ -241,6 +241,17 @@ main() {
   local cur_settings="$HOME/Library/Application Support/Cursor/User/settings.json"
   local cur_keys="$HOME/Library/Application Support/Cursor/User/keybindings.json"
   if [[ -d "$HOME/Library/Application Support/Cursor" ]]; then
+    if command -v cursor >/dev/null 2>&1; then
+      if [[ "$DRY_RUN" == "--dry-run" ]]; then
+        log "would install cursor extension enkia.tokyo-night"
+      else
+        cursor --install-extension enkia.tokyo-night >/dev/null 2>&1 \
+          && log "✓ cursor extension enkia.tokyo-night" \
+          || warn "failed to install enkia.tokyo-night (non-fatal)"
+      fi
+    else
+      warn "cursor CLI missing — skipping Tokyo Night extension install"
+    fi
     merge_json_fragment "$cur_settings" "$REPO/cursor/settings.json.fragment"
     merge_json_fragment "$cur_keys"     "$REPO/cursor/keybindings.json.fragment"
   else
