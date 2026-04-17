@@ -1,0 +1,21 @@
+# Runtime backups
+.dream-terminal-backup-*/
+*.backup
+*.bak
+*.local
+
+# Real secrets (template is tracked as .example)
+zsh/secrets.zsh
+.env
+.env.*
+
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Node
+node_modules/
