@@ -48,7 +48,55 @@ merge_json_fragment() {
   [[ -f "$target" ]] || echo '{}' > "$target"
   mkdir -p "$(dirname "$BACKUP/$target")"
   cp -a "$target" "$BACKUP/$target"
-  jq -s '.[0] * .[1]' "$target" "$fragment" > "$target.tmp"
+  # Cursor/VSCode settings + keybindings are JSONC (// comments, /* */ blocks,
+  # trailing commas). Strip with a string-aware state machine — regex gets fooled
+  # by strings containing `//` like file:/// URLs. Comments are lost on merge;
+  # backup above preserves the pre-merge file with comments intact.
+  python3 - "$target" "$fragment" <<'PY' > "$target.tmp"
+import json, re, sys
+target, fragment = sys.argv[1], sys.argv[2]
+with open(target, 'r', encoding='utf-8') as f: txt = f.read()
+
+def strip_jsonc(s):
+    out, i, n = [], 0, len(s)
+    in_string = False
+    escape = False
+    while i < n:
+        c = s[i]
+        if in_string:
+            out.append(c)
+            if escape: escape = False
+            elif c == '\\': escape = True
+            elif c == '"': in_string = False
+            i += 1
+            continue
+        if c == '"':
+            in_string = True; out.append(c); i += 1; continue
+        if c == '/' and i + 1 < n:
+            nxt = s[i+1]
+            if nxt == '/':
+                j = s.find('\n', i)
+                i = j if j != -1 else n
+                continue
+            if nxt == '*':
+                j = s.find('*/', i+2)
+                i = (j + 2) if j != -1 else n
+                continue
+        out.append(c); i += 1
+    return ''.join(out)
+
+cleaned = strip_jsonc(txt)
+cleaned = re.sub(r',(\s*[}\]])', r'\1', cleaned)
+base = json.loads(cleaned) if cleaned.strip() else ({} if fragment.endswith('settings.json.fragment') else [])
+with open(fragment, 'r', encoding='utf-8') as f: frag = json.load(f)
+if isinstance(base, list) and isinstance(frag, list):
+    merged = base + frag
+elif isinstance(base, dict) and isinstance(frag, dict):
+    merged = {**base, **frag}
+else:
+    raise SystemExit(f"type mismatch: base={type(base).__name__} frag={type(frag).__name__}")
+json.dump(merged, sys.stdout, indent=2)
+PY
   mv "$target.tmp" "$target"
   log "merged $(basename "$fragment") into $target"
 }
@@ -97,7 +145,7 @@ remove_zinit_block() {
 remove_spaceship_theme() {
   local rc="$HOME/.zshrc"
   [[ -f "$rc" ]] || return 0
-  grep -q 'ZSH_THEME="spaceship"' "$rc" || { log "✓ no spaceship theme"; return; }
+  grep -q '^ZSH_THEME="spaceship"' "$rc" || { log "✓ no active spaceship theme"; return; }
   if [[ "$DRY_RUN" == "--dry-run" ]]; then
     log "would comment out ZSH_THEME=spaceship"
     return
