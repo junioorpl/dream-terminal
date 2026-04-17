@@ -1,0 +1,73 @@
+# dream-terminal Starship config — Tokyo Night Storm palette + two-line
+# Colors:
+#   fg=#c0caf5  dim=#a9b1d6  accent=#ff4fcf  blue=#7aa2f7
+#   green=#9ece6a yellow=#e0af68 red=#f7768e purple=#bb9af7 cyan=#7dcfff
+
+format = """
+$username\
+$directory\
+$git_branch\
+$git_status\
+$nodejs\
+$python\
+$java\
+$cmd_duration\
+$line_break\
+$character"""
+
+add_newline = false
+command_timeout = 1000
+
+[character]
+success_symbol = "[❯](bold #ff4fcf)"
+error_symbol   = "[❯](bold #f7768e)"
+vimcmd_symbol  = "[❮](bold #9ece6a)"
+
+[username]
+show_always = true
+style_user  = "bold #7aa2f7"
+format      = "[$user]($style) "
+
+[directory]
+style      = "bold #7dcfff"
+truncation_length = 3
+truncate_to_repo  = true
+format     = "[$path]($style)[$read_only]($read_only_style) "
+
+[git_branch]
+style  = "bold #bb9af7"
+symbol = " "
+format = "on [$symbol$branch]($style) "
+
+[git_status]
+style     = "bold #e0af68"
+format    = "[$all_status$ahead_behind]($style) "
+ahead     = "⇡${count}"
+behind    = "⇣${count}"
+diverged  = "⇕⇡${ahead_count}⇣${behind_count}"
+conflicted = "="
+modified  = "!"
+staged    = "+"
+untracked = "?"
+stashed   = "\\$"
+
+[nodejs]
+style  = "bold #9ece6a"
+symbol = " "
+format = "via [$symbol$version]($style) "
+
+[python]
+style  = "bold #e0af68"
+symbol = " "
+format = "via [$symbol$version]($style) "
+
+[java]
+style  = "bold #f7768e"
+symbol = " "
+format = "via [$symbol$version]($style) "
+
+[cmd_duration]
+style               = "bold #565f89"
+format              = "took [$duration]($style) "
+min_time            = 2000
+show_milliseconds   = false
