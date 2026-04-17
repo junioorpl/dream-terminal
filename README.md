@@ -4,7 +4,7 @@ Reproducible macOS terminal + shell + IDE-integrated-terminal stack with Claude 
 
 - **Primary:** Ghostty (native, fast, free)
 - **Fallback:** Hyper (modernized, minimal)
-- **IDE:** Cursor integrated terminal (aligned font/theme/keybinds)
+- **IDE:** Cursor + VSCode integrated terminal (aligned font/theme/keybinds)
 - **Shell:** zsh + oh-my-zsh + starship
 - **Theme:** Tokyo Night Storm (glass, opacity 0.78 / blur 40)
 - **Font:** JetBrainsMono Nerd Font 14px with ligatures

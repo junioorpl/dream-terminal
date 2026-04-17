@@ -205,6 +205,30 @@ link_ghostty_cli() {
   log "→ $target → $src"
 }
 
+# Merge Cursor/VSCode theme + keybinds into a target IDE's user config.
+# $1 = label (display), $2 = app-support dir name, $3 = CLI command
+align_ide() {
+  local label="$1" app_dir="$2" cli="$3"
+  local base="$HOME/Library/Application Support/$app_dir/User"
+  if [[ ! -d "$HOME/Library/Application Support/$app_dir" ]]; then
+    warn "$label user dir not found — skipping"
+    return
+  fi
+  if command -v "$cli" >/dev/null 2>&1; then
+    if [[ "$DRY_RUN" == "--dry-run" ]]; then
+      log "would install $label extension enkia.tokyo-night"
+    else
+      "$cli" --install-extension enkia.tokyo-night >/dev/null 2>&1 \
+        && log "✓ $label extension enkia.tokyo-night" \
+        || warn "failed to install enkia.tokyo-night in $label (non-fatal)"
+    fi
+  else
+    warn "$cli CLI missing — skipping Tokyo Night extension install for $label"
+  fi
+  merge_json_fragment "$base/settings.json"    "$REPO/cursor/settings.json.fragment"
+  merge_json_fragment "$base/keybindings.json" "$REPO/cursor/keybindings.json.fragment"
+}
+
 main() {
   log "dream-terminal install starting (backup: $BACKUP)"
   ensure_backup_dir
@@ -240,29 +264,12 @@ main() {
   remove_spaceship_theme
   ensure_zshrc_block
 
-  # Phase 5 — Cursor merge
-  local cur_settings="$HOME/Library/Application Support/Cursor/User/settings.json"
-  local cur_keys="$HOME/Library/Application Support/Cursor/User/keybindings.json"
-  if [[ -d "$HOME/Library/Application Support/Cursor" ]]; then
-    if command -v cursor >/dev/null 2>&1; then
-      if [[ "$DRY_RUN" == "--dry-run" ]]; then
-        log "would install cursor extension enkia.tokyo-night"
-      else
-        cursor --install-extension enkia.tokyo-night >/dev/null 2>&1 \
-          && log "✓ cursor extension enkia.tokyo-night" \
-          || warn "failed to install enkia.tokyo-night (non-fatal)"
-      fi
-    else
-      warn "cursor CLI missing — skipping Tokyo Night extension install"
-    fi
-    merge_json_fragment "$cur_settings" "$REPO/cursor/settings.json.fragment"
-    merge_json_fragment "$cur_keys"     "$REPO/cursor/keybindings.json.fragment"
-  else
-    warn "Cursor user dir not found — skipping Cursor alignment"
-  fi
+  # Phase 5 — Cursor + VSCode merge (same fragments; VSCode is the parent schema)
+  align_ide "Cursor" "Cursor" "cursor"
+  align_ide "VSCode" "Code"   "code"
 
   log "done. backup: $BACKUP"
-  log "next: quit and relaunch Ghostty / Hyper / Cursor to pick up changes."
+  log "next: quit and relaunch Ghostty / Hyper / Cursor / VSCode to pick up changes."
 }
 
 main "$@"
