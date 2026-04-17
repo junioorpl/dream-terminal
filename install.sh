@@ -151,8 +151,50 @@ link_ghostty_cli() {
 main() {
   log "dream-terminal install starting (backup: $BACKUP)"
   ensure_backup_dir
-  # Phase actions — filled in subsequent tasks
-  log "done."
+
+  # Phase 3a — Ghostty (config + CLI symlink)
+  link_ghostty_cli
+  symlink_with_backup "$REPO/ghostty/config"          "$HOME/.config/ghostty/config"
+  # Phase 3b — Starship
+  symlink_with_backup "$REPO/starship/starship.toml"  "$HOME/.config/starship.toml"
+  # Phase 3c — Hyper (config only; plugin removal below)
+  symlink_with_backup "$REPO/hyper/.hyper.js"         "$HOME/.hyper.js"
+
+  # Phase 3c follow-up — remove dead plugin
+  local hdrac="$HOME/.hyper_plugins/node_modules/hyper-dracula"
+  if [[ -d "$hdrac" ]]; then
+    if [[ "$DRY_RUN" == "--dry-run" ]]; then
+      log "would remove stale $hdrac"
+    else
+      mkdir -p "$BACKUP/.hyper_plugins/node_modules"
+      cp -a "$hdrac" "$BACKUP/.hyper_plugins/node_modules/hyper-dracula"
+      rm -rf "$hdrac"
+      log "removed stale hyper-dracula plugin"
+    fi
+  else
+    log "✓ hyper-dracula already absent"
+  fi
+
+  # Phase 4 — Shell fragments + .zshrc mutation
+  install_omz_custom_plugin zsh-autosuggestions     https://github.com/zsh-users/zsh-autosuggestions.git
+  install_omz_custom_plugin zsh-syntax-highlighting https://github.com/zsh-users/zsh-syntax-highlighting.git
+  install_omz_custom_plugin zsh-completions         https://github.com/zsh-users/zsh-completions.git
+  remove_zinit_block
+  remove_spaceship_theme
+  ensure_zshrc_block
+
+  # Phase 5 — Cursor merge
+  local cur_settings="$HOME/Library/Application Support/Cursor/User/settings.json"
+  local cur_keys="$HOME/Library/Application Support/Cursor/User/keybindings.json"
+  if [[ -d "$HOME/Library/Application Support/Cursor" ]]; then
+    merge_json_fragment "$cur_settings" "$REPO/cursor/settings.json.fragment"
+    merge_json_fragment "$cur_keys"     "$REPO/cursor/keybindings.json.fragment"
+  else
+    warn "Cursor user dir not found — skipping Cursor alignment"
+  fi
+
+  log "done. backup: $BACKUP"
+  log "next: quit and relaunch Ghostty / Hyper / Cursor to pick up changes."
 }
 
 main "$@"
