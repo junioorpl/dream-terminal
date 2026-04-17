@@ -1,0 +1,1 @@
+/Users/euripedescabral/cabral-dev/brain/decisions/2026-04-17-dream-terminal-architecture.md
